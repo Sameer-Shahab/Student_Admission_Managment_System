@@ -42,9 +42,6 @@ def init_db():
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
 
-    # Drop old table if exists for fresh start
-    cursor.execute("DROP TABLE IF EXISTS documents")
-    
     # Create new students table with all required fields
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS students (
@@ -61,13 +58,51 @@ def init_db():
             original_image_path TEXT,
             photo_path TEXT,
             processed_image_path TEXT,
+            roll_number TEXT,
+            batch TEXT,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )
     """)
 
+    # Add missing columns to existing DBs (safe, best-effort).
+    cursor.execute("PRAGMA table_info(students)")
+    existing = {row[1] for row in cursor.fetchall()}
+    for col, ddl in [
+        ("roll_number", "ALTER TABLE students ADD COLUMN roll_number TEXT"),
+        ("batch", "ALTER TABLE students ADD COLUMN batch TEXT"),
+    ]:
+        if col not in existing:
+            try:
+                cursor.execute(ddl)
+            except sqlite3.OperationalError:
+                pass
+
+    # Documents uploaded via the legacy admin form (/upload).
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS student_documents (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            student_db_id INTEGER NOT NULL,
+            roll_number TEXT NOT NULL,
+            doc_type TEXT NOT NULL,
+            filename TEXT NOT NULL,
+            file_path TEXT NOT NULL,
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY(student_db_id) REFERENCES students(id) ON DELETE CASCADE
+        )
+    """)
+
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_students_roll ON students(roll_number)")
+    cursor.execute("CREATE INDEX IF NOT EXISTS idx_docs_roll ON student_documents(roll_number)")
+
     conn.commit()
     conn.close()
+
+
+def get_db_conn():
+    conn = sqlite3.connect(DATABASE)
+    conn.row_factory = sqlite3.Row
+    return conn
 
 # -----------------------------
 # Admin Helpers (Legacy HTML Dashboard)
@@ -842,15 +877,78 @@ def upload():
 
         opt_idx += 1
 
+    # ---- Persist to database (student + document records) ----
+    conn = get_db_conn()
+    cursor = conn.cursor()
+
+    # Make sure student exists (we re-use students table for both OCR/API and legacy form).
+    cursor.execute("SELECT id FROM students WHERE roll_number = ?", (roll_number,))
+    row = cursor.fetchone()
+    if row:
+        student_db_id = row["id"]
+        cursor.execute(
+            "UPDATE students SET department=?, batch=?, updated_at=CURRENT_TIMESTAMP WHERE id=?",
+            (department, full_year, student_db_id),
+        )
+    else:
+        # For legacy form we use roll_number as student_id (unique, stable).
+        cursor.execute(
+            """
+            INSERT INTO students (student_id, full_name, department, roll_number, batch)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (roll_number, f"Student {roll_number}", department, roll_number, full_year),
+        )
+        student_db_id = cursor.lastrowid
+
+    def _upsert_doc(doc_type: str, filename: str, path: str):
+        cursor.execute(
+            """
+            DELETE FROM student_documents
+            WHERE roll_number = ? AND doc_type = ?
+            """,
+            (roll_number, doc_type),
+        )
+        cursor.execute(
+            """
+            INSERT INTO student_documents (student_db_id, roll_number, doc_type, filename, file_path)
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (student_db_id, roll_number, doc_type, filename, path),
+        )
+
+    domicile_pdf = os.path.join(student_folder, f"{roll_number}_domicile.pdf")
+    marksheet_pdf = os.path.join(student_folder, f"{roll_number}_marksheet.pdf")
+    if os.path.isfile(domicile_pdf):
+        _upsert_doc("domicile", os.path.basename(domicile_pdf), domicile_pdf)
+    if os.path.isfile(marksheet_pdf):
+        _upsert_doc("marksheet", os.path.basename(marksheet_pdf), marksheet_pdf)
+
+    # Optional docs are additive.
+    for i in range(1, opt_idx):
+        optional_pdf = os.path.join(student_folder, f"{roll_number}_optional_{i}.pdf")
+        if os.path.isfile(optional_pdf):
+            cursor.execute(
+                """
+                INSERT INTO student_documents (student_db_id, roll_number, doc_type, filename, file_path)
+                VALUES (?, ?, ?, ?, ?)
+                """,
+                (student_db_id, roll_number, f"optional_{i}", os.path.basename(optional_pdf), optional_pdf),
+            )
+
+    conn.commit()
+    conn.close()
+
     # ---- Clean temp files ----
     for path in temp_files:
         if os.path.exists(path):
             os.remove(path)
 
     optional_count = max(0, opt_idx - 1)
-    msg = f"Domicile and Mark Sheet saved successfully."
+    msg = f"Saved for {roll_number}: Domicile + Mark Sheet."
     if optional_count:
         msg += f" Optional PDFs: {optional_count}."
+    msg += " You can open the record from Dashboard -> View."
     return msg
 
 # -----------------------------
@@ -861,7 +959,29 @@ def admin_dashboard():
     if not session.get('admin'):
         return redirect('/login')
 
-    data = list_legacy_students_from_folders()
+    # Prefer DB-backed students (created via /upload). Fallback to folder scan for legacy data.
+    conn = get_db_conn()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT roll_number, department, batch
+            FROM students
+            WHERE roll_number IS NOT NULL
+            ORDER BY created_at DESC
+            """
+        )
+        rows = cursor.fetchall()
+    except sqlite3.OperationalError:
+        rows = []
+    finally:
+        conn.close()
+
+    if rows:
+        data = [{"roll": r["roll_number"], "department": r["department"], "batch": r["batch"]} for r in rows]
+    else:
+        data = list_legacy_students_from_folders()
+
     return render_template("admin.html", students=data)
 
 
@@ -877,6 +997,18 @@ def delete_student_api(roll):
 
     if student_folder and os.path.exists(student_folder):
         shutil.rmtree(student_folder)
+
+    # Remove DB records (best-effort).
+    conn = get_db_conn()
+    cursor = conn.cursor()
+    try:
+        cursor.execute("DELETE FROM student_documents WHERE roll_number = ?", (roll,))
+        cursor.execute("DELETE FROM students WHERE roll_number = ?", (roll,))
+        conn.commit()
+    except sqlite3.OperationalError:
+        pass
+    finally:
+        conn.close()
 
     return redirect(url_for('admin_dashboard'))
 
@@ -934,19 +1066,42 @@ def student_detail(roll):
         return redirect('/login')
 
     student_folder = resolve_student_folder(roll)
-    if not student_folder:
-        abort(404)
 
-    files = []
+    # Prefer DB document list.
+    docs = []
+    conn = get_db_conn()
+    cursor = conn.cursor()
     try:
-        for name in sorted(os.listdir(student_folder)):
-            path = os.path.join(student_folder, name)
-            if os.path.isfile(path):
-                files.append(name)
-    except OSError:
+        cursor.execute(
+            """
+            SELECT doc_type, filename
+            FROM student_documents
+            WHERE roll_number = ?
+            ORDER BY created_at DESC
+            """,
+            (roll,),
+        )
+        docs = [{"doc_type": r["doc_type"], "filename": r["filename"]} for r in cursor.fetchall()]
+    except sqlite3.OperationalError:
+        docs = []
+    finally:
+        conn.close()
+
+    # Fallback to folder listing if DB has nothing.
+    files = []
+    if student_folder and os.path.isdir(student_folder):
+        try:
+            for name in sorted(os.listdir(student_folder)):
+                path = os.path.join(student_folder, name)
+                if os.path.isfile(path):
+                    files.append(name)
+        except OSError:
+            files = []
+
+    if not docs and not files:
         abort(404)
 
-    return render_template("student_detail.html", roll=roll, files=files)
+    return render_template("student_detail.html", roll=roll, docs=docs, files=files)
 
 @app.route('/student/<roll>/download/<path:filename>')
 def student_download(roll, filename):
@@ -971,13 +1126,31 @@ def student_download(roll, filename):
 # -----------------------------
 @app.route('/api/analytics')
 def analytics_data():
-    # Legacy dashboard analytics is derived from folder structure (not DB),
-    # because the current SQLite schema has no "batch" column.
-    students = list_legacy_students_from_folders()
+    # Prefer DB analytics; fallback to folder scan if DB is empty or unavailable.
     counts = {}
-    for s in students:
-        b = s.get("batch") or "Unknown"
-        counts[b] = counts.get(b, 0) + 1
+    conn = get_db_conn()
+    cursor = conn.cursor()
+    try:
+        cursor.execute(
+            """
+            SELECT batch, COUNT(*)
+            FROM students
+            WHERE roll_number IS NOT NULL AND batch IS NOT NULL
+            GROUP BY batch
+            """
+        )
+        for b, c in cursor.fetchall():
+            counts[b] = c
+    except sqlite3.OperationalError:
+        counts = {}
+    finally:
+        conn.close()
+
+    if not counts:
+        students = list_legacy_students_from_folders()
+        for s in students:
+            b = s.get("batch") or "Unknown"
+            counts[b] = counts.get(b, 0) + 1
 
     labels = sorted(counts.keys())
     values = [counts[k] for k in labels]
