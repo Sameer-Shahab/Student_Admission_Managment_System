@@ -1,0 +1,51 @@
+# Root ignore rules (Windows + Python + Node + artifacts)
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+*.pyo
+*.pdb
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+venv/
+.venv/
+.venv*/
+server/venv/
+
+# Node / Next.js
+node_modules/
+client/node_modules/
+client/.next/
+client/out/
+client/build/
+
+# Env files
+.env
+.env.*
+!.env.example
+server/.env
+server/.env.*
+!server/.env.example
+
+# Local data / outputs
+*.db
+*.sqlite
+*.sqlite3
+*.xlsx
+server/student_documents/
+server/uploads/
+student_documents/
+uploads/
+
+# OS/editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.vscode/
+.idea/
+

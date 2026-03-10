@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Details - {{ roll }}</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif;}
+    body{background:linear-gradient(135deg,#1e1b4b,#0f172a);color:white;min-height:100vh;padding:24px;}
+    .container{max-width:920px;margin:0 auto;}
+    .card{
+      background:rgba(255,255,255,0.06);
+      border:1px solid rgba(0,255,255,0.25);
+      border-radius:16px;
+      padding:18px;
+      backdrop-filter:blur(10px);
+      box-shadow:0 0 25px rgba(0,255,255,0.08);
+    }
+    .top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:14px;}
+    .title{font-size:20px;font-weight:600;color:#00ffff;}
+    .meta{opacity:0.9;font-size:13px;}
+    a{color:#00ffff;text-decoration:none;}
+    a:hover{text-decoration:underline;}
+    .files{margin-top:14px;}
+    .file{
+      display:flex;align-items:center;justify-content:space-between;gap:12px;
+      padding:12px;border-radius:12px;
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(255,255,255,0.08);
+      margin-bottom:10px;
+    }
+    .file-name{word-break:break-all;}
+    .btn{
+      display:inline-block;
+      padding:8px 12px;
+      border-radius:10px;
+      background:rgba(0,255,255,0.18);
+      border:1px solid rgba(0,255,255,0.35);
+      color:white;
+      transition:0.2s;
+      white-space:nowrap;
+    }
+    .btn:hover{background:rgba(0,255,255,0.25);box-shadow:0 0 12px rgba(0,255,255,0.25);}
+    .empty{
+      padding:14px;border-radius:12px;
+      background:rgba(255,255,255,0.03);
+      border:1px dashed rgba(0,255,255,0.35);
+      opacity:0.9;
+      margin-top:12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="top">
+        <div>
+          <div class="title">Student: {{ roll }}</div>
+          <div class="meta"><a href="/admin">Back to Dashboard</a></div>
+        </div>
+      </div>
+
+      <div class="files">
+        <h3 style="margin-bottom:10px;">Documents</h3>
+        {% if files and files|length > 0 %}
+          {% for f in files %}
+            <div class="file">
+              <div class="file-name">{{ f }}</div>
+              <a class="btn" href="/student/{{ roll }}/download/{{ f }}">Download</a>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="empty">No files found for this student.</div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</body>
+</html>
+

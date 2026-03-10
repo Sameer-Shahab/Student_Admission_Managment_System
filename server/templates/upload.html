@@ -1,0 +1,569 @@
+{% set embedded = embedded|default(false) %}
+
+    <style>
+
+        {% if not embedded %}
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+            color: white;
+            /* display: flex; */
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        {% endif %}
+
+        .fix-upload{
+            display: block;
+        }
+
+        .fix-upload.embedded{
+            padding: 0;
+        }
+
+        .fix-upload.embedded main{
+            padding: 0;
+            display:flex;
+            justify-content:center;
+        }
+
+        .fix-upload.embedded .card{
+            width: 100%;
+            max-width: 760px;
+            margin: 0 auto;
+        }
+
+        /* HEADER */
+        header {
+            text-align: center;
+            padding: 30px 0;
+        }
+
+        .header-logo {
+            width: 160px;
+            filter: drop-shadow(0 0 15px #00f7ff);
+        }
+
+        /* MAIN CARD */
+        main {
+            flex: 1;
+            /* display: flex; */
+            justify-content: center;
+            align-items: center;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            padding: 40px;
+            width: 400px;
+            border-radius: 16px;
+            box-shadow:
+                0 0 20px rgba(0, 255, 255, 0.4),
+                0 0 40px rgba(255, 0, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 700;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 500;
+            letter-spacing: 1px;
+            font-size: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        input[type="text"],
+        input[type="file"] {
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            outline: none;
+            font-size: 15px;
+            background: rgba(255,255,255,0.1);
+            color: white;
+        }
+
+        input::file-selector-button {
+            background: #00f7ff;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        button {
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background: linear-gradient(90deg, #00f7ff, #00aaff);
+            color: black;
+            font-weight: bold;
+            transition: 0.3s ease;
+            box-shadow: 0 0 15px #00f7ff;
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px #00f7ff;
+        }
+
+        /* FOOTER */
+        footer {
+            text-align: center;
+            padding: 15px 0;
+            font-size: 14px;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(8px);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .footer-logo {
+            width: 48px;
+            vertical-align: middle;
+            margin-right: 8px;
+            filter: drop-shadow(0 0 8px #00f7ff);
+        }
+
+        .lab-name {
+            color: #00f7ff;
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        a{
+    padding:12px;
+    margin-bottom:10px;
+    text-decoration:none;
+    color: #00f7ff;
+    border-radius:8px;
+    transition:0.3s;
+        }
+
+    </style>
+
+<div class="fix-upload{% if embedded %} embedded{% endif %}">
+    <!-- HEADER -->
+    <!-- <header>
+        <img class="header-logo"
+             src="{{ url_for('static', filename='university_logo.png') }}"
+             alt="University Logo">
+             <h2><a href="{{ url_for('admin_dashboard') }}">NED-SAMS</a></h2>
+     </header> -->
+
+    <!-- MAIN -->
+    <main>
+  <div class="card">
+
+    <h1>Admission Digital Management System</h1>
+    <h2>Upload Student Documents</h2>
+
+    <form id="studentUploadForm" action="/upload" method="post" enctype="multipart/form-data" autocomplete="off">
+
+      <!-- Department -->
+      <div class="form-group">
+        <label for="department">Department</label>
+        <select id="department" name="department" required>
+          <option value="">Select Department</option>
+        <!-- Civil & Petroleum Engineering -->
+        <option value="CE">Civil Engineering</option>
+        <option value="UIE">Urban & Infrastructure Eng</option>
+        <option value="PE">Petroleum Engineering</option>
+        <option value="EEQ">Earthquake Engineering</option>
+        <option value="ENV">Environmental Engineering</option>
+
+        <!-- Electrical & Computer Engineering -->
+        <option value="EE">Electrical Engineering</option>
+        <option value="EC">Electronic Engineering</option>
+        <option value="TE">Telecommunications Engineering</option>
+        <option value="CISE">Computer & Info Systems Eng</option>
+        <option value="BME">Bio-Medical Engineering</option>
+        <option value="CSE">Computer Science & IT</option>
+        <option value="SE">Software Engineering</option>
+
+        <!-- Mechanical & Manufacturing Engineering -->
+        <option value="ME">Mechanical Engineering</option>
+        <option value="IME">Industrial & Manufacturing Eng</option>
+        <option value="TE">Textile Engineering</option>
+        <option value="AME">Automotive & Marine Eng</option>
+
+        <!-- Chemical & Process Engineering -->
+        <option value="CHE">Chemical Engineering</option>
+        <option value="PPE">Polymer & Petrochemical Eng</option>
+        <option value="MAT">Materials Engineering</option>
+        <option value="MET">Metallurgical Engineering</option>
+        <option value="FE">Food Engineering</option>
+
+        <!-- Architecture & Sciences -->
+        <option value="ARCH">Architecture & Planning</option>
+        <option value="ECON">Economics & Management</option>
+        <option value="PHYS">Physics</option>
+        <option value="CHEM">Chemistry</option>
+        <option value="MATH">Mathematics</option>
+        <option value="ENG">English Linguistics & Allied Studies</option>
+        <option value="ES">Essential Studies</option>
+        </select>
+      </div>
+
+      <!-- Batch -->
+      <div class="form-group">
+        <label for="batch">Batch</label>
+        <select id="batch" name="batch" required>
+          <option value="">Select Batch</option>
+          <option value="21">2021</option>
+          <option value="22">2022</option>
+          <option value="23">2023</option>
+          <option value="24">2024</option>
+          <option value="25">2025</option>
+          <option value="26">2026</option>
+        </select>
+      </div>
+
+      <!-- Roll Number -->
+      <div class="form-group">
+        <label for="roll_number">Roll Number</label>
+        <div class="roll-container">
+          <input type="text" id="roll_prefix" readonly placeholder="__-__">
+          <input 
+    type="text" 
+    id="roll_number" 
+    name="roll_number"
+    placeholder="XXX" 
+    maxlength="3"
+    pattern="\d{3}"
+    required>
+    <input type="hidden" id="full_roll" name="full_roll">
+        </div>
+      </div>
+
+      <!-- Mandatory Uploads -->
+      <div class="form-group">
+        <label for="domicile_files">Domicile (Required)</label>
+        <div class="upload-box">
+          <input id="domicile_files" type="file" name="domicile_files" accept="image/*" multiple required>
+          <div class="upload-hint">Upload one or more images for the Domicile document.</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="marksheet_files">Intermediate / O-Levels Mark Sheet (Required)</label>
+        <div class="upload-box">
+          <input id="marksheet_files" type="file" name="marksheet_files" accept="image/*" multiple required>
+          <div class="upload-hint">Upload one or more images for the Mark Sheet document.</div>
+        </div>
+      </div>
+
+      <!-- Optional Uploads -->
+      <div class="form-group">
+        <label for="optional_files">Other Documents (Optional)</label>
+        <div class="upload-box optional">
+          <input id="optional_files" type="file" name="optional_files" accept="image/*" multiple>
+          <div class="upload-hint">Optional additional images (each will be saved as a separate PDF).</div>
+        </div>
+      </div>
+
+      <button id="addStudentBtn" type="submit">Add Student!</button>
+    </form>
+
+    <div id="uploadToast" class="toast" aria-live="polite" aria-atomic="true"></div>
+  </div>
+</main>
+
+    <!-- FOOTER -->
+    {% if not embedded %}
+    <footer>
+        <img class="footer-logo"
+             src="{{ url_for('static', filename='imes_lab_logo.png') }}"
+             alt="IMES Logo">
+
+        <span class="lab-name"> Powered by : IMES LAB</span>
+    </footer>
+    {% endif %}
+</div>
+
+<style>
+/* CARD */
+.card {
+    width: 90%;
+    max-width: 450px;
+    padding: 30px 20px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(12px);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4), 0 0 40px rgba(255, 0, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Form Elements */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+select, input[type="text"], input[type="file"] {
+    /* width: 100%; */
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    outline: none;
+    background: rgba(255,255,255,0.1);
+    color: rgb(0, 0, 0);
+    font-size: 15px;
+}
+
+select {
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.2);
+    background: rgba(255,255,255,0.1);
+    color: white;
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+}
+
+select:focus {
+    outline: none;
+    box-shadow: 0 0 10px #00f7ff;
+}
+
+select option {
+    background-color: #2f286e93;  
+    color: black;             
+}
+
+.roll-container {
+    display: flex;
+    width: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.1);
+}
+
+.roll-container input#roll_prefix {
+    flex: 0 0 35%;
+    background: #00f7ff;
+    border: none;
+    padding: 12px;
+    color: rgb(0, 0, 0);
+    font-weight: bold;
+    pointer-events: none;
+    text-align: center;
+}
+
+.roll-container input#roll_number {
+    flex: 1;
+    border: none;
+    padding: 12px;
+    background: transparent;
+    color: white;
+    outline: none;
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+button {
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    background: linear-gradient(90deg, #00f7ff, #00aaff);
+    color: black;
+    font-weight: bold;
+    transition: 0.3s ease;
+    box-shadow: 0 0 15px #00f7ff;
+}
+
+button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 25px #00f7ff;
+}
+
+.upload-box{
+    padding:14px;
+    border-radius:14px;
+    background: rgba(255, 255, 255, 0.04);
+    border:1px solid rgba(0, 247, 255, 0.22);
+    box-shadow: 0 0 18px rgba(0, 247, 255, 0.08);
+}
+
+.upload-box.optional{
+    border-color: rgba(255,255,255,0.14);
+    box-shadow:none;
+}
+
+.upload-hint{
+    margin-top:10px;
+    font-size:12px;
+    opacity:0.8;
+}
+
+/* Toast (used when embedded in /admin) */
+.toast{
+    position:fixed;
+    right:18px;
+    bottom:18px;
+    max-width: min(520px, 92vw);
+    padding:12px 14px;
+    border-radius:14px;
+    background:rgba(15,23,42,0.92);
+    border:1px solid rgba(0,255,255,0.22);
+    box-shadow:0 0 24px rgba(0,255,255,0.18);
+    color:white;
+    opacity:0;
+    transform:translateY(10px);
+    pointer-events:none;
+    transition:opacity 220ms ease, transform 220ms ease;
+    z-index:9999;
+}
+
+.toast.show{
+    opacity:1;
+    transform:translateY(0);
+}
+
+.toast.ok{
+    border-color:rgba(0,255,255,0.35);
+}
+
+.toast.err{
+    border-color:rgba(255,85,85,0.45);
+    box-shadow:0 0 24px rgba(255,85,85,0.12);
+}
+
+input:focus, select:focus {
+    box-shadow: 0 0 10px #00f7ff;
+    transition: 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 500px) {
+    .card {
+        padding: 20px 15px;
+    }
+    h1, h2 {
+        font-size: 18px;
+    }
+}
+</style>
+
+<script>
+const departmentSelect = document.getElementById("department");
+const batchSelect = document.getElementById("batch");
+const rollPrefix = document.getElementById("roll_prefix");
+
+function updateRollPrefix() {
+    const dept = departmentSelect.value;
+    const batch = batchSelect.value;
+    if (dept && batch) {
+        rollPrefix.value = `${dept}-${batch}`;
+    } else {
+        rollPrefix.value = "";
+    }
+}
+
+departmentSelect.addEventListener("change", updateRollPrefix);
+batchSelect.addEventListener("change", updateRollPrefix);
+
+document.getElementById("roll_number").addEventListener("input", function () {
+    this.value = this.value.replace(/\D/g, "").slice(0,3);
+});
+
+const rollInput = document.getElementById("roll_number");
+const fullRoll = document.getElementById("full_roll");
+
+function updateFullRoll() {
+    const dept = departmentSelect.value;
+    const batch = batchSelect.value;
+    const roll = rollInput.value;
+
+    if (dept && batch && roll.length === 3) {
+        fullRoll.value = `${dept}-${batch}-${roll}`;
+    }
+}
+
+departmentSelect.addEventListener("change", updateFullRoll);
+batchSelect.addEventListener("change", updateFullRoll);
+rollInput.addEventListener("input", updateFullRoll);
+</script>
+
+{% if embedded %}
+<script>
+(() => {
+  const form = document.getElementById("studentUploadForm");
+  const btn = document.getElementById("addStudentBtn");
+  const toast = document.getElementById("uploadToast");
+  if (!form || !btn || !toast) return;
+
+  let toastTimer = null;
+
+  function showToast(message, kind) {
+    if (toastTimer) clearTimeout(toastTimer);
+    toast.classList.remove("ok", "err", "show");
+    toast.textContent = message;
+    toast.classList.add(kind === "err" ? "err" : "ok");
+    requestAnimationFrame(() => toast.classList.add("show"));
+    toastTimer = setTimeout(() => toast.classList.remove("show"), 4200);
+  }
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    if (!fullRoll.value) {
+      showToast("Please select Department, Batch and enter a 3-digit roll number.", "err");
+      return;
+    }
+
+    const data = new FormData(form);
+    btn.disabled = true;
+    const oldLabel = btn.textContent;
+    btn.textContent = "Uploading...";
+
+    try {
+      const res = await fetch(form.action, { method: "POST", body: data });
+      const text = await res.text();
+      if (!res.ok) {
+        showToast(text || "Upload failed.", "err");
+        return;
+      }
+
+      showToast(text || "Documents uploaded successfully.", "ok");
+      form.reset();
+      rollPrefix.value = "";
+      fullRoll.value = "";
+    } catch (err) {
+      showToast("Network error. Please try again.", "err");
+    } finally {
+      btn.disabled = false;
+      btn.textContent = oldLabel;
+    }
+  });
+})();
+</script>
+{% endif %}
+
+
+
+
