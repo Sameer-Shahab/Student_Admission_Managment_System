@@ -9,17 +9,13 @@ services:
       - key: PYTHON_VERSION
         value: "3.12.8"
       - key: UPLOAD_FOLDER
-        value: /var/data/student_documents
+        value: /tmp/student_documents
       - key: DATABASE
-        value: /var/data/database.db
+        value: /tmp/database.db
       - key: SECRET_KEY
         generateValue: true
       - key: ADMIN_USERNAME
         value: admin
       - key: ADMIN_PASSWORD
         sync: false
-    disk:
-      name: ned-sams-data
-      mountPath: /var/data
-      sizeGB: 1
-
+    # Demo-only: no persistent disk attached. Uploads/DB are ephemeral.
