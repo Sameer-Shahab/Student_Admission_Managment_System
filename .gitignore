@@ -36,6 +36,10 @@ server/.env.*
 *.sqlite
 *.sqlite3
 *.xlsx
+server/database*.out
+server/database*.err
+server/database*.log
+server/database.cmds_tmp
 server/student_documents/
 server/uploads/
 student_documents/

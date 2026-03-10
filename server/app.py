@@ -1,18 +1,21 @@
 import os
-import sqlite3
-from flask import Flask, request, render_template, jsonify, send_file, redirect, url_for, session, abort
-from flask_cors import CORS
-from datetime import datetime, timedelta
-import cv2
-from PIL import Image
 import re
-import pytesseract
-from openpyxl import Workbook
-from io import BytesIO
-import hashlib
 import secrets
 import shutil
+import sqlite3
+import threading
+import hashlib
+from datetime import datetime, timedelta
+from io import BytesIO
+
+import cv2
+import numpy as np
 import pandas as pd
+import pytesseract
+from PIL import Image
+from openpyxl import Workbook
+from flask import Flask, request, render_template, jsonify, send_file, redirect, url_for, session, abort
+from flask_cors import CORS
 
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 
@@ -34,11 +37,60 @@ app.secret_key = SECRET_KEY
 # In-memory token storage (use Redis in production)
 active_tokens = {}
 
+_db_init_lock = threading.Lock()
+_db_inited = False
+
+
+def ensure_sqlite_db():
+    """
+    If DATABASE points to a non-SQLite file, move it aside and let init_db() recreate it.
+    This prevents crashes like: sqlite3.DatabaseError: file is not a database
+    """
+    db_dir = os.path.dirname(DATABASE)
+    if db_dir:
+        os.makedirs(db_dir, exist_ok=True)
+
+    if os.path.isdir(DATABASE):
+        raise RuntimeError(f"DATABASE path points to a directory: {DATABASE}")
+
+    if not os.path.exists(DATABASE):
+        return
+
+    try:
+        with open(DATABASE, "rb") as f:
+            header = f.read(16)
+    except OSError:
+        return
+
+    # SQLite header: b"SQLite format 3\\x00"
+    if header.startswith(b"SQLite format 3"):
+        return
+
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    backup_path = f"{DATABASE}.corrupt_{ts}"
+    try:
+        os.replace(DATABASE, backup_path)
+    except OSError:
+        # If we can't rename, leave it; downstream will still error.
+        pass
+
+
+def ensure_db_initialized():
+    global _db_inited
+    if _db_inited:
+        return
+    with _db_init_lock:
+        if _db_inited:
+            return
+        init_db()
+        _db_inited = True
+
 
 # -----------------------------
 # Initialize Database
 # -----------------------------
 def init_db():
+    ensure_sqlite_db()
     conn = sqlite3.connect(DATABASE)
     cursor = conn.cursor()
 
@@ -68,15 +120,36 @@ def init_db():
     # Add missing columns to existing DBs (safe, best-effort).
     cursor.execute("PRAGMA table_info(students)")
     existing = {row[1] for row in cursor.fetchall()}
-    for col, ddl in [
-        ("roll_number", "ALTER TABLE students ADD COLUMN roll_number TEXT"),
-        ("batch", "ALTER TABLE students ADD COLUMN batch TEXT"),
-    ]:
-        if col not in existing:
-            try:
-                cursor.execute(ddl)
-            except sqlite3.OperationalError:
-                pass
+
+    # Keep this list aligned with the CREATE TABLE above.
+    # We cannot reliably add NOT NULL constraints during ALTER TABLE, so migrations add columns as nullable.
+    desired_columns = [
+        ("student_id", "TEXT"),
+        ("full_name", "TEXT"),
+        ("email", "TEXT"),
+        ("phone", "TEXT"),
+        ("department", "TEXT"),
+        ("program", "TEXT"),
+        ("year_of_study", "TEXT"),
+        ("document_type", "TEXT"),
+        ("extracted_text", "TEXT"),
+        ("original_image_path", "TEXT"),
+        ("photo_path", "TEXT"),
+        ("processed_image_path", "TEXT"),
+        ("roll_number", "TEXT"),
+        ("batch", "TEXT"),
+        ("created_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"),
+        ("updated_at", "TIMESTAMP DEFAULT CURRENT_TIMESTAMP"),
+    ]
+
+    for col, col_ddl in desired_columns:
+        if col in existing:
+            continue
+        try:
+            cursor.execute(f"ALTER TABLE students ADD COLUMN {col} {col_ddl}")
+        except sqlite3.OperationalError:
+            # Older SQLite versions or odd schemas may fail; keep best-effort behavior.
+            pass
 
     # Documents uploaded via the legacy admin form (/upload).
     cursor.execute("""
@@ -100,6 +173,8 @@ def init_db():
 
 
 def get_db_conn():
+    ensure_db_initialized()
+    ensure_sqlite_db()
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
@@ -319,12 +394,8 @@ def index():
 
 
 # -----------------------------
-# Simple Document Scan Effect
-# -----------------------------
-# -----------------------------
 # Document Scanner (CLEAN VERSION)
 # -----------------------------
-import numpy as np
 
 
 def order_points(pts):
