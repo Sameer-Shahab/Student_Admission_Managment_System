@@ -1,8 +1,10 @@
 flask==3.1.2
 flask-cors==5.0.0
+gunicorn==23.0.0
 numpy>=2.0.0
-opencv-python>=4.13.0
+opencv-python-headless>=4.13.0
 PyPDF2==3.0.1
+pandas==2.2.3
 Pillow==12.1.1
 pytesseract==0.3.13
 reportlab==4.4.10

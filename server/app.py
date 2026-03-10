@@ -14,11 +14,17 @@ import secrets
 import shutil
 import pandas as pd
 
-app = Flask(__name__)
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+
+app = Flask(
+    __name__,
+    static_folder=os.path.join(BASE_DIR, "static"),
+    template_folder=os.path.join(BASE_DIR, "templates"),
+)
 CORS(app, resources={r"/api/*": {"origins": "*"}})
 
-UPLOAD_FOLDER = "student_documents"
-DATABASE = "database.db"
+UPLOAD_FOLDER = os.getenv("UPLOAD_FOLDER", os.path.join(BASE_DIR, "student_documents"))
+DATABASE = os.getenv("DATABASE", os.path.join(BASE_DIR, "database.db"))
 SECRET_KEY = os.getenv('SECRET_KEY', 'default-secret-key-change-in-production')
 ADMIN_USERNAME = os.getenv('ADMIN_USERNAME', 'admin')
 ADMIN_PASSWORD = os.getenv('ADMIN_PASSWORD', 'ned@admin123')
