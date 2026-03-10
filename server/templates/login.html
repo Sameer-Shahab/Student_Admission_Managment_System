@@ -1,197 +1,512 @@
 <!DOCTYPE html>
-<html>
+<html data-theme="dark">
 <head>
 <title>NED-SAMS Login</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Poppins',sans-serif;
-}
-body{
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    height:100vh;
-    background:linear-gradient(135deg,#0f172a,#1e1b4b);
-    color:white;
-    overflow:hidden;
+
+/* ═══════════════════════════════════════════
+   THEME TOKENS
+═══════════════════════════════════════════ */
+[data-theme="dark"] {
+  --bg-left:      #0e1a14;
+  --bg-right:     #0a1510;
+  --accent:       #0a76d4;
+  --accent2:      #3086f0;
+  --accent-dim:   rgba(10, 101, 212, 0.15);
+  --accent-line:  rgba(10, 81, 212, 0.22);
+  --text-primary: #e8ede9;
+  --text-sub:     #8da898;
+  --text-muted:   rgba(141,168,152,0.45);
+  --input-bg:     rgba(255,255,255,0.05);
+  --input-border: rgba(23, 10, 212, 0.2);
+  --input-focus:  rgba(10, 77, 212, 0.5);
+  --input-glow:   rgba(212,135,10,0.09);
+  --input-text:   #d8e8dc;
+  --input-ph:     rgba(141,168,152,0.40);
+  --btn-from:     #086fc4;
+  --btn-to:       #0637a8;
+  --btn-text:     #0a1510;
+  --btn-shadow:   rgba(52, 8, 196, 0.32);
+  --divider:      rgba(10, 17, 212, 0.18);
+  --corner:       rgba(10, 64, 212, 0.18);
+  --error-bg:     rgba(200,50,50,0.12);
+  --error-border: rgba(200,50,50,0.28);
+  --error-text:   #f4b4b4;
+  --stripe:       rgba(212,135,10,0.025);
+  --glow1:        rgba(80, 180, 180, 0.07);
+  --glow2:        rgba(10, 168, 212, 0.08);
+  --badge-text:   #0a2fd4;
+  --switch-bg:    rgba(255,255,255,0.07);
+  --switch-border:rgba(10, 81, 212, 0.3);
+  --switch-color: #0a9bd4;
 }
 
-.login-box{
-    width:min(92vw, 460px);
-    background:rgba(255,255,255,0.08);
-    padding:34px 30px;
-    border-radius:22px;
-    backdrop-filter:blur(18px);
-    border:1px solid rgba(0,255,255,0.28);
-    box-shadow:0 0 55px rgba(0,255,255,0.22);
-    animation:fadeIn 1s ease-in-out;
-    position:relative;
-    z-index:2;
+[data-theme="light"] {
+  --bg-left:      #e8f0ea;
+  --bg-right:     #f4f8f5;
+  --accent:       #176b5a;
+  --accent2:      #0f4f42;
+  --accent-dim:   rgba(23,107,90,0.10);
+  --accent-line:  rgba(23,107,90,0.18);
+  --text-primary: #0d2e26;
+  --text-sub:     #3d6b5e;
+  --text-muted:   rgba(61,107,94,0.50);
+  --input-bg:     rgba(255,255,255,0.85);
+  --input-border: rgba(23,107,90,0.22);
+  --input-focus:  rgba(23,107,90,0.55);
+  --input-glow:   rgba(23,107,90,0.08);
+  --input-text:   #0d2e26;
+  --input-ph:     rgba(61,107,94,0.45);
+  --btn-from:     #176b5a;
+  --btn-to:       #0f4f42;
+  --btn-text:     #ffffff;
+  --btn-shadow:   rgba(23,107,90,0.28);
+  --divider:      rgba(23,107,90,0.15);
+  --corner:       rgba(23,107,90,0.20);
+  --error-bg:     rgba(200,50,50,0.08);
+  --error-border: rgba(200,50,50,0.22);
+  --error-text:   #8c1c1c;
+  --stripe:       rgba(23,107,90,0.025);
+  --glow1:        rgba(23,107,90,0.06);
+  --glow2:        rgba(120,200,160,0.09);
+  --badge-text:   #176b5a;
+  --switch-bg:    rgba(23,107,90,0.08);
+  --switch-border:rgba(23,107,90,0.28);
+  --switch-color: #176b5a;
 }
 
-@keyframes fadeIn{
-    from{opacity:0; transform:scale(0.8);}
-    to{opacity:1; transform:scale(1);}
+/* ═══════════════════════════════════════════
+   BASE
+═══════════════════════════════════════════ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family: 'Outfit', sans-serif;
+  min-height: 100vh;
+  display: flex;
+  background: var(--bg-right);
+  overflow: hidden;
+  transition: background 0.4s ease;
 }
 
-input{
-    display:block;
-    width:100%;
-    margin:10px 0 14px 0;
-    padding:12px 14px 12px 42px;
-    border-radius:12px;
-    border:1px solid rgba(255,255,255,0.18);
-    outline:none;
-    background:rgba(255,255,255,0.07);
-    color:white;
-    transition:0.2s;
+/* ═══════════════════════════════════════════
+   THEME TOGGLE
+═══════════════════════════════════════════ */
+.theme-btn {
+  position: fixed;
+  top: 20px; right: 24px;
+  z-index: 999;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 13px 7px 10px;
+  border-radius: 50px;
+  background: var(--switch-bg);
+  border: 1px solid var(--switch-border);
+  cursor: pointer;
+  transition: all 0.25s ease;
+  backdrop-filter: blur(10px);
+}
+.theme-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px var(--accent-dim);
+  border-color: var(--accent);
+}
+.theme-btn svg {
+  width: 17px; height: 17px;
+  stroke: var(--switch-color);
+  transition: stroke 0.3s;
+}
+.theme-btn span {
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--switch-color);
+  font-weight: 500;
+  transition: color 0.3s;
+}
+.icon-moon { display:block; }
+.icon-sun  { display:none;  }
+[data-theme="light"] .icon-moon { display:none; }
+[data-theme="light"] .icon-sun  { display:block; }
+
+/* ═══════════════════════════════════════════
+   LEFT PANEL
+═══════════════════════════════════════════ */
+.panel-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 56px 64px;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-left);
+  transition: background 0.4s ease;
+}
+.panel-left::before {
+  content:'';
+  position:absolute; inset:0;
+  background-image: repeating-linear-gradient(
+    -55deg, transparent, transparent 44px,
+    var(--stripe) 44px, var(--stripe) 45px
+  );
+  pointer-events:none;
+}
+.orb {
+  position:absolute; border-radius:50%;
+  filter:blur(72px); pointer-events:none;
+  transition: background 0.4s;
+}
+.orb-a { width:460px;height:460px;background:var(--glow1);top:-170px;left:-130px; }
+.orb-b { width:380px;height:380px;background:var(--glow2);bottom:-150px;right:-110px; }
+
+.top-badge {
+  display:flex; align-items:center; gap:10px;
+  animation: fadeUp 0.65s ease both;
+  position:relative; z-index:2;
+}
+.badge-dot {
+  width:8px; height:8px; border-radius:50%;
+  background:var(--accent);
+  box-shadow: 0 0 8px var(--accent);
+  transition: background 0.3s, box-shadow 0.3s;
+}
+.top-badge span {
+  font-size:10px; letter-spacing:0.20em;
+  text-transform:uppercase; color:var(--badge-text);
+  font-weight:500; transition:color 0.3s;
 }
 
-input:focus{
-    border-color:rgba(0,255,255,0.6);
-    box-shadow:0 0 0 4px rgba(0,255,255,0.12);
+.hero {
+  position:relative; z-index:2;
+  animation: fadeUp 0.75s 0.1s ease both;
+}
+.hero h1 {
+  font-family:'Cormorant Garamond', Georgia, serif;
+  font-size: clamp(36px, 3.8vw, 54px);
+  font-weight:600; line-height:1.12;
+  color:var(--text-primary); margin-bottom:20px;
+  transition:color 0.3s;
+}
+.hero h1 em { font-style:italic; color:var(--accent); transition:color 0.3s; }
+.hero p {
+  font-size:13.5px; color:var(--text-sub);
+  line-height:1.82; max-width:320px;
+  font-weight:300; transition:color 0.3s;
 }
 
-button{
-    width:100%;
-    padding:12px;
-    border-radius:14px;
-    background:linear-gradient(45deg, cyan, #00aaff);
-    border:none;
-    font-weight:700;
-    cursor:pointer;
-    transition:0.25s;
+.stat-row {
+  display:flex; gap:28px; margin-top:34px;
+  position:relative; z-index:2;
 }
-button:hover{
-    transform:translateY(-1px);
-    box-shadow:0 0 24px rgba(0,255,255,0.35);
+.stat { display:flex; flex-direction:column; gap:3px; }
+.stat .num {
+  font-family:'Cormorant Garamond', serif;
+  font-size:26px; font-weight:600;
+  color:var(--accent); line-height:1;
+  transition:color 0.3s;
 }
-
-.brand{
-    display:flex;
-    align-items:center;
-    /* gap:12px; */
-    justify-content:center;
-    margin-bottom:18px;
-    box-shadow:0 0 18px rgba(0,255,255,0.22);
-    border-radius:14px; 
-    background:rgba(255,255,255,0.08);
+.stat .lbl {
+  font-size:10px; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--text-muted);
+  font-weight:400; transition:color 0.3s;
 }
-.brand img{
-    width:120px;
-    height:80px;
-    /* padding:6px; */
-}
-.brand .title{
-    text-align:left;
-    line-height:1.1;
-    padding-right: 10px;
-}
-.brand .title h2{
-    font-size:18px;
-    font-weight:700;
-    color:#00ffff;
-}
-.brand .title p{
-    font-size:12px;
-    opacity:0.9;
+.stat-sep {
+  width:1px; background:var(--divider);
+  align-self:stretch; transition:background 0.3s;
 }
 
-.field{
-    position:relative;
-}
-.icon{
-    position:absolute;
-    left:14px;
-    top:50%;
-    transform:translateY(-50%);
-    width:18px;
-    height:18px;
-    opacity:0.85;
+.footer-note {
+  font-size:10.5px; color:var(--text-muted);
+  letter-spacing:0.06em;
+  animation: fadeUp 0.75s 0.25s ease both;
+  position:relative; z-index:2; transition:color 0.3s;
 }
 
-.hint{
-    margin-top:14px;
-    font-size:12px;
-    opacity:0.78;
-    text-align:center;
+/* ═══════════════════════════════════════════
+   DIVIDER
+═══════════════════════════════════════════ */
+.v-divider {
+  width:1px; flex-shrink:0;
+  background: linear-gradient(to bottom,
+    transparent, var(--divider) 20%,
+    var(--divider) 80%, transparent);
+  transition:background 0.4s;
 }
 
-.error{
-    margin:10px 0 14px 0;
-    padding:10px 12px;
-    border-radius:14px;
-    background:rgba(255,0,0,0.12);
-    border:1px solid rgba(255,0,0,0.25);
-    color:#ffd1d1;
-    font-weight:600;
-    font-size:13px;
+/* ═══════════════════════════════════════════
+   RIGHT PANEL
+═══════════════════════════════════════════ */
+.panel-right {
+  width: min(100%, 456px);
+  display:flex; align-items:center; justify-content:center;
+  padding: 52px 52px;
+  background:var(--bg-right);
+  position:relative;
+  transition:background 0.4s ease;
+}
+.panel-right::before {
+  content:''; position:absolute;
+  top:26px; right:26px;
+  width:30px; height:30px;
+  border-top:1.5px solid var(--corner);
+  border-right:1.5px solid var(--corner);
+  pointer-events:none; transition:border-color 0.3s;
+}
+.panel-right::after {
+  content:''; position:absolute;
+  bottom:26px; left:26px;
+  width:30px; height:30px;
+  border-bottom:1.5px solid var(--corner);
+  border-left:1.5px solid var(--corner);
+  pointer-events:none; transition:border-color 0.3s;
 }
 
-/* Background glow */
-.bg-orb{
-    position:absolute;
-    width:520px;
-    height:520px;
-    border-radius:999px;
-    filter:blur(60px);
-    opacity:0.55;
-    z-index:1;
+/* ═══════════════════════════════════════════
+   FORM
+═══════════════════════════════════════════ */
+.form-wrap {
+  width:100%;
+  animation: fadeUp 0.85s 0.15s ease both;
 }
-.orb1{background:rgba(0,255,255,0.35); top:-220px; left:-160px;}
-.orb2{background:rgba(0,170,255,0.35); bottom:-240px; right:-180px;}
-.grid{
-    position:absolute;
-    inset:0;
-    background-image:
-      linear-gradient(rgba(0,255,255,0.06) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(0,255,255,0.06) 1px, transparent 1px);
-    background-size:48px 48px;
-    mask-image: radial-gradient(circle at 50% 35%, rgba(0,0,0,1) 0, rgba(0,0,0,0.35) 55%, rgba(0,0,0,0) 78%);
-    z-index:0;
+
+.logo-block {
+  display:flex; align-items:center; gap:14px;
+  padding-bottom:26px; margin-bottom:28px;
+  border-bottom:1px solid var(--accent-line);
+  transition:border-color 0.3s;
+}
+.logo-block img { width:48px; height:48px; object-fit:contain; }
+.logo-block h2 {
+  font-family:'Cormorant Garamond', serif;
+  font-size:20px; font-weight:600;
+  color:var(--text-primary); letter-spacing:0.04em;
+  transition:color 0.3s;
+}
+.logo-block .sub {
+  font-size:10px; letter-spacing:0.15em;
+  text-transform:uppercase; color:var(--accent);
+  margin-top:2px; font-weight:500; transition:color 0.3s;
+}
+
+.field-group { margin-bottom:18px; }
+.field-group label {
+  display:block; font-size:10.5px;
+  letter-spacing:0.14em; text-transform:uppercase;
+  color:var(--text-sub); font-weight:500;
+  margin-bottom:7px; transition:color 0.3s;
+}
+.input-wrap { position:relative; }
+.input-wrap .fi {
+  position:absolute; left:13px; top:50%;
+  transform:translateY(-50%);
+  width:15px; height:15px;
+  stroke:var(--accent); opacity:0.75;
+  transition:stroke 0.3s;
+}
+.input-wrap input {
+  width:100%;
+  background:var(--input-bg);
+  border:1px solid var(--input-border);
+  border-radius:9px;
+  padding:12px 14px 12px 40px;
+  color:var(--input-text);
+  font-family:'Outfit', sans-serif;
+  font-size:14px; outline:none;
+  transition:border-color 0.2s, box-shadow 0.2s, background 0.3s, color 0.3s;
+}
+.input-wrap input::placeholder { color:var(--input-ph); }
+.input-wrap input:focus {
+  border-color:var(--input-focus);
+  box-shadow:0 0 0 3px var(--input-glow);
+}
+
+.error {
+  display:flex; align-items:center; gap:10px;
+  padding:11px 14px; border-radius:9px;
+  background:var(--error-bg);
+  border:1px solid var(--error-border);
+  color:var(--error-text); font-size:13px;
+  margin-bottom:18px;
+  transition:background 0.3s, border-color 0.3s, color 0.3s;
+}
+.error-icon {
+  width:16px; height:16px; border-radius:50%;
+  background:var(--error-border);
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; font-weight:700; flex-shrink:0;
+  color:var(--error-text);
+}
+
+.btn-submit {
+  width:100%; padding:13px;
+  border-radius:9px;
+  background:linear-gradient(135deg, var(--btn-from), var(--btn-to));
+  border:none;
+  color:var(--btn-text);
+  font-family:'Outfit', sans-serif;
+  font-size:12px; font-weight:600;
+  letter-spacing:0.14em; text-transform:uppercase;
+  cursor:pointer; margin-top:10px;
+  position:relative; overflow:hidden;
+  transition:opacity 0.2s, transform 0.15s, box-shadow 0.2s, background 0.3s;
+}
+.btn-submit::before {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
+}
+.btn-submit:hover {
+  opacity:.93; transform:translateY(-1px);
+  box-shadow:0 8px 26px var(--btn-shadow);
+}
+.btn-submit:active { transform:translateY(0); }
+
+.disclaimer {
+  margin-top:22px; font-size:10.5px;
+  color:var(--text-muted); text-align:center;
+  letter-spacing:0.04em; line-height:1.7;
+  transition:color 0.3s;
+}
+
+/* ═══════════════════════════════════════════
+   ANIMATION
+═══════════════════════════════════════════ */
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(14px); }
+  to   { opacity:1; transform:translateY(0);    }
+}
+
+/* ═══════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════ */
+@media (max-width: 780px) {
+  .panel-left, .v-divider { display:none; }
+  .panel-right { width:100%; min-height:100vh; padding:52px 28px; }
 }
 </style>
 </head>
 <body>
 
-<div class="bg-orb orb1"></div>
-<div class="bg-orb orb2"></div>
-<div class="grid"></div>
+<!-- Theme toggle -->
+<button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+  <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/>
+  </svg>
+  <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="5"/>
+    <line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+    <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+  </svg>
+  <span id="t-label">Light</span>
+</button>
 
-<div class="login-box">
-    <div class="brand">
-        <img src="{{ url_for('static', filename='university_logo.png') }}" alt="University Logo">
-        <div class="title">
-            <h2>NED-SAMS</h2>
-            <p>Admin Portal</p>
-        </div>
+<!-- Left brand panel -->
+<div class="panel-left">
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+
+  <div class="top-badge">
+    <div class="badge-dot"></div>
+    <span>Secure Admin Portal</span>
+  </div>
+
+  <div class="hero">
+    <h1>Student Admission <br><em>Management</em><br>System</h1>
+    <p>Centralised administration platform for NED University of Engineering &amp; Technology — managing academic records, faculty allocations, and institutional data with precision.</p>
+
+    <div class="stat-row">
+      <div class="stat">
+        <span class="num">40k+</span>
+        <span class="lbl">Students</span>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat">
+        <span class="num">1969</span>
+        <span class="lbl">Est.</span>
+      </div>
+      <div class="stat-sep"></div>
+      <div class="stat">
+        <span class="num">60+</span>
+        <span class="lbl">Depts.</span>
+      </div>
     </div>
-    {% if error %}
-        <div class="error">{{ error }}</div>
-    {% endif %}
-    <form method="POST">
-        <div class="field">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-            </svg>
-            <input type="text" name="username" placeholder="Username" required autofocus>
-        </div>
-        <div class="field">
-            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-            </svg>
-            <input type="password" name="password" placeholder="Password" required>
-        </div>
-        <button type="submit">Sign In</button>
-    </form>
-    <div class="hint">Unauthorized access is prohibited.</div>
+  </div>
+
+  <div class="footer-note">NED University of Engineering &amp; Technology &nbsp;·&nbsp; Karachi, Pakistan</div>
 </div>
 
+<div class="v-divider"></div>
+
+<!-- Right login panel -->
+<div class="panel-right">
+  <div class="form-wrap">
+    <div class="logo-block">
+      <img src="{{ url_for('static', filename='university_logo.png') }}" alt="NED University Logo">
+      <div>
+        <h2>NED-SAMS</h2>
+        <div class="sub">Administrator Access</div>
+      </div>
+    </div>
+
+    {% if error %}
+      <div class="error">
+        <div class="error-icon">!</div>
+        {{ error }}
+      </div>
+    {% endif %}
+
+    <form method="POST">
+      <div class="field-group">
+        <label for="username">Username</label>
+        <div class="input-wrap">
+          <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+          </svg>
+          <input type="text" id="username" name="username" placeholder="Enter your username" required autofocus>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label for="password">Password</label>
+        <div class="input-wrap">
+          <svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
+              d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+          <input type="password" id="password" name="password" placeholder="Enter your password" required>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-submit">Sign In →</button>
+    </form>
+
+    <p class="disclaimer">Unauthorised access is strictly prohibited<br>and may be subject to disciplinary action.</p>
+  </div>
+</div>
+
+<script>
+  function toggleTheme() {
+    const html = document.documentElement;
+    const going = html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', going);
+    document.getElementById('t-label').textContent = going === 'dark' ? 'Light' : 'Dark';
+    localStorage.setItem('ned-theme', going);
+  }
+  (function(){
+    const s = localStorage.getItem('ned-theme');
+    if (s) {
+      document.documentElement.setAttribute('data-theme', s);
+      const l = document.getElementById('t-label');
+      if (l) l.textContent = s === 'dark' ? 'Light' : 'Dark';
+    }
+  })();
+</script>
 </body>
 </html>

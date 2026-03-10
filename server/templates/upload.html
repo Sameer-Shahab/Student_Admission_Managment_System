@@ -1,569 +1,411 @@
 {% set embedded = embedded|default(false) %}
 
-    <style>
-
-        {% if not embedded %}
-        body {
-            margin: 0;
-            font-family: 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-            color: white;
-            /* display: flex; */
-            flex-direction: column;
-            min-height: 100vh;
-        }
-        {% endif %}
-
-        .fix-upload{
-            display: block;
-        }
-
-        .fix-upload.embedded{
-            padding: 0;
-        }
-
-        .fix-upload.embedded main{
-            padding: 0;
-            display:flex;
-            justify-content:center;
-        }
-
-        .fix-upload.embedded .card{
-            width: 100%;
-            max-width: 760px;
-            margin: 0 auto;
-        }
-
-        /* HEADER */
-        header {
-            text-align: center;
-            padding: 30px 0;
-        }
-
-        .header-logo {
-            width: 160px;
-            filter: drop-shadow(0 0 15px #00f7ff);
-        }
-
-        /* MAIN CARD */
-        main {
-            flex: 1;
-            /* display: flex; */
-            justify-content: center;
-            align-items: center;
-        }
-
-        .card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            padding: 40px;
-            width: 400px;
-            border-radius: 16px;
-            box-shadow:
-                0 0 20px rgba(0, 255, 255, 0.4),
-                0 0 40px rgba(255, 0, 255, 0.2);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        h1 {
-            text-align: center;
-            margin-bottom: 25px;
-            font-weight: 700;
-            letter-spacing: 1px;
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 25px;
-            font-weight: 500;
-            letter-spacing: 1px;
-            font-size: 20px;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        input[type="text"],
-        input[type="file"] {
-            padding: 12px;
-            border-radius: 8px;
-            border: none;
-            outline: none;
-            font-size: 15px;
-            background: rgba(255,255,255,0.1);
-            color: white;
-        }
-
-        input::file-selector-button {
-            background: #00f7ff;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        button {
-            padding: 14px;
-            border: none;
-            border-radius: 10px;
-            font-size: 16px;
-            cursor: pointer;
-            background: linear-gradient(90deg, #00f7ff, #00aaff);
-            color: black;
-            font-weight: bold;
-            transition: 0.3s ease;
-            box-shadow: 0 0 15px #00f7ff;
-        }
-
-        button:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 25px #00f7ff;
-        }
-
-        /* FOOTER */
-        footer {
-            text-align: center;
-            padding: 15px 0;
-            font-size: 14px;
-            background: rgba(0,0,0,0.4);
-            backdrop-filter: blur(8px);
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-
-        .footer-logo {
-            width: 48px;
-            vertical-align: middle;
-            margin-right: 8px;
-            filter: drop-shadow(0 0 8px #00f7ff);
-        }
-
-        .lab-name {
-            color: #00f7ff;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-
-        a{
-    padding:12px;
-    margin-bottom:10px;
-    text-decoration:none;
-    color: #00f7ff;
-    border-radius:8px;
-    transition:0.3s;
-        }
-
-    </style>
-
-<div class="fix-upload{% if embedded %} embedded{% endif %}">
-    <!-- HEADER -->
-    <!-- <header>
-        <img class="header-logo"
-             src="{{ url_for('static', filename='university_logo.png') }}"
-             alt="University Logo">
-             <h2><a href="{{ url_for('admin_dashboard') }}">NED-SAMS</a></h2>
-     </header> -->
-
-    <!-- MAIN -->
-    <main>
-  <div class="card">
-
-    <h1>Admission Digital Management System</h1>
-    <h2>Upload Student Documents</h2>
-
-    <form id="studentUploadForm" action="/upload" method="post" enctype="multipart/form-data" autocomplete="off">
-
-      <!-- Department -->
-      <div class="form-group">
-        <label for="department">Department</label>
-        <select id="department" name="department" required>
-          <option value="">Select Department</option>
-        <!-- Civil & Petroleum Engineering -->
-        <option value="CE">Civil Engineering</option>
-        <option value="UIE">Urban & Infrastructure Eng</option>
-        <option value="PE">Petroleum Engineering</option>
-        <option value="EEQ">Earthquake Engineering</option>
-        <option value="ENV">Environmental Engineering</option>
-
-        <!-- Electrical & Computer Engineering -->
-        <option value="EE">Electrical Engineering</option>
-        <option value="EC">Electronic Engineering</option>
-        <option value="TE">Telecommunications Engineering</option>
-        <option value="CISE">Computer & Info Systems Eng</option>
-        <option value="BME">Bio-Medical Engineering</option>
-        <option value="CSE">Computer Science & IT</option>
-        <option value="SE">Software Engineering</option>
-
-        <!-- Mechanical & Manufacturing Engineering -->
-        <option value="ME">Mechanical Engineering</option>
-        <option value="IME">Industrial & Manufacturing Eng</option>
-        <option value="TE">Textile Engineering</option>
-        <option value="AME">Automotive & Marine Eng</option>
-
-        <!-- Chemical & Process Engineering -->
-        <option value="CHE">Chemical Engineering</option>
-        <option value="PPE">Polymer & Petrochemical Eng</option>
-        <option value="MAT">Materials Engineering</option>
-        <option value="MET">Metallurgical Engineering</option>
-        <option value="FE">Food Engineering</option>
-
-        <!-- Architecture & Sciences -->
-        <option value="ARCH">Architecture & Planning</option>
-        <option value="ECON">Economics & Management</option>
-        <option value="PHYS">Physics</option>
-        <option value="CHEM">Chemistry</option>
-        <option value="MATH">Mathematics</option>
-        <option value="ENG">English Linguistics & Allied Studies</option>
-        <option value="ES">Essential Studies</option>
-        </select>
-      </div>
-
-      <!-- Batch -->
-      <div class="form-group">
-        <label for="batch">Batch</label>
-        <select id="batch" name="batch" required>
-          <option value="">Select Batch</option>
-          <option value="21">2021</option>
-          <option value="22">2022</option>
-          <option value="23">2023</option>
-          <option value="24">2024</option>
-          <option value="25">2025</option>
-          <option value="26">2026</option>
-        </select>
-      </div>
-
-      <!-- Roll Number -->
-      <div class="form-group">
-        <label for="roll_number">Roll Number</label>
-        <div class="roll-container">
-          <input type="text" id="roll_prefix" readonly placeholder="__-__">
-          <input 
-    type="text" 
-    id="roll_number" 
-    name="roll_number"
-    placeholder="XXX" 
-    maxlength="3"
-    pattern="\d{3}"
-    required>
-    <input type="hidden" id="full_roll" name="full_roll">
-        </div>
-      </div>
-
-      <!-- Mandatory Uploads -->
-      <div class="form-group">
-        <label for="domicile_files">Domicile (Required)</label>
-        <div class="upload-box">
-          <input id="domicile_files" type="file" name="domicile_files" accept="image/*" multiple required>
-          <div class="upload-hint">Upload one or more images for the Domicile document.</div>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label for="marksheet_files">Intermediate / O-Levels Mark Sheet (Required)</label>
-        <div class="upload-box">
-          <input id="marksheet_files" type="file" name="marksheet_files" accept="image/*" multiple required>
-          <div class="upload-hint">Upload one or more images for the Mark Sheet document.</div>
-        </div>
-      </div>
-
-      <!-- Optional Uploads -->
-      <div class="form-group">
-        <label for="optional_files">Other Documents (Optional)</label>
-        <div class="upload-box optional">
-          <input id="optional_files" type="file" name="optional_files" accept="image/*" multiple>
-          <div class="upload-hint">Optional additional images (each will be saved as a separate PDF).</div>
-        </div>
-      </div>
-
-      <button id="addStudentBtn" type="submit">Add Student!</button>
-    </form>
-
-    <div id="uploadToast" class="toast" aria-live="polite" aria-atomic="true"></div>
-  </div>
-</main>
-
-    <!-- FOOTER -->
-    {% if not embedded %}
-    <footer>
-        <img class="footer-logo"
-             src="{{ url_for('static', filename='imes_lab_logo.png') }}"
-             alt="IMES Logo">
-
-        <span class="lab-name"> Powered by : IMES LAB</span>
-    </footer>
-    {% endif %}
-</div>
+{% if not embedded %}
+<!DOCTYPE html>
+<html data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NED-SAMS — Upload Documents</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+{% endif %}
 
 <style>
-/* CARD */
-.card {
-    width: 90%;
-    max-width: 450px;
-    padding: 30px 20px;
-    border-radius: 16px;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(12px);
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.4), 0 0 40px rgba(255, 0, 255, 0.2);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
+{% if not embedded %}
+[data-theme="dark"] {
+  --bg:           #0a1510;
+  --accent:       #0a76d4;
+  --accent-dim:   rgba(10,101,212,0.15);
+  --accent-line:  rgba(10,81,212,0.22);
+  --text-primary: #e8ede9;
+  --text-sub:     #8da898;
+  --text-muted:   rgba(141,168,152,0.45);
+  --surface:      rgba(255,255,255,0.05);
+  --border:       rgba(10,81,212,0.22);
+  --input-bg:     rgba(255,255,255,0.05);
+  --input-border: rgba(23,10,212,0.2);
+  --input-focus:  rgba(10,77,212,0.5);
+  --btn-from:     #086fc4;
+  --btn-to:       #0637a8;
+  --btn-text:     #ffffff;
+  --btn-shadow:   rgba(52,8,196,0.32);
+  --stripe:       rgba(10,101,212,0.025);
+  --switch-bg:    rgba(255,255,255,0.07);
+  --switch-border:rgba(10,81,212,0.3);
+  --switch-color: #0a9bd4;
+}
+[data-theme="light"] {
+  --bg:           #f4f8f5;
+  --accent:       #176b5a;
+  --accent-dim:   rgba(23,107,90,0.10);
+  --accent-line:  rgba(23,107,90,0.18);
+  --text-primary: #0d2e26;
+  --text-sub:     #3d6b5e;
+  --text-muted:   rgba(61,107,94,0.50);
+  --surface:      rgba(255,255,255,0.7);
+  --border:       rgba(23,107,90,0.18);
+  --input-bg:     rgba(255,255,255,0.85);
+  --input-border: rgba(23,107,90,0.22);
+  --input-focus:  rgba(23,107,90,0.55);
+  --btn-from:     #176b5a;
+  --btn-to:       #0f4f42;
+  --btn-text:     #ffffff;
+  --btn-shadow:   rgba(23,107,90,0.28);
+  --stripe:       rgba(23,107,90,0.025);
+  --switch-bg:    rgba(23,107,90,0.08);
+  --switch-border:rgba(23,107,90,0.28);
+  --switch-color: #176b5a;
 }
 
-/* Form Elements */
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+body {
+  font-family:'Outfit',sans-serif;
+  background:var(--bg); color:var(--text-primary);
+  min-height:100vh; display:flex; flex-direction:column;
+  align-items:center; justify-content:flex-start;
+  padding:56px 16px 32px;
+  transition:background 0.4s;
+  position:relative;
+}
+body::before {
+  content:''; position:fixed; inset:0;
+  background-image:repeating-linear-gradient(-55deg,transparent,transparent 44px,var(--stripe) 44px,var(--stripe) 45px);
+  pointer-events:none;
 }
 
-select, input[type="text"], input[type="file"] {
-    /* width: 100%; */
-    padding: 12px;
-    border-radius: 8px;
-    border: none;
-    outline: none;
-    background: rgba(255,255,255,0.1);
-    color: rgb(0, 0, 0);
-    font-size: 15px;
+.theme-btn {
+  position:fixed; top:14px; right:14px; z-index:999;
+  display:flex; align-items:center; gap:7px;
+  padding:7px 13px 7px 10px; border-radius:50px;
+  background:var(--switch-bg); border:1px solid var(--switch-border);
+  cursor:pointer; transition:all 0.25s; backdrop-filter:blur(10px);
+}
+.theme-btn:hover { border-color:var(--accent); }
+.theme-btn svg { width:17px; height:17px; stroke:var(--switch-color); }
+.theme-btn span { font-size:10.5px; letter-spacing:0.12em; text-transform:uppercase; color:var(--switch-color); font-weight:500; }
+.icon-moon { display:block; } .icon-sun { display:none; }
+[data-theme="light"] .icon-moon { display:none; }
+[data-theme="light"] .icon-sun  { display:block; }
+
+.standalone-header {
+  width:100%; max-width:520px; margin-bottom:24px;
+  display:flex; align-items:center; gap:14px;
+  animation:fadeUp 0.65s ease both;
+}
+.standalone-header img { width:44px; height:44px; object-fit:contain; }
+.standalone-header h2 { font-family:'Cormorant Garamond',serif; font-size:19px; font-weight:600; color:var(--text-primary); letter-spacing:0.04em; }
+.standalone-header .sub { font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--accent); margin-top:2px; font-weight:500; }
+
+.standalone-footer {
+  margin-top:24px; display:flex; align-items:center; gap:8px;
+  font-size:11.5px; color:var(--text-muted);
+  animation:fadeUp 0.8s 0.25s ease both;
+}
+.standalone-footer img { width:26px; height:26px; object-fit:contain; }
+.standalone-footer strong { color:var(--accent); font-weight:500; }
+{% endif %}
+
+/* ── UPLOAD CARD ── */
+.upload-card {
+  background:var(--surface); border:1px solid var(--border); border-radius:16px;
+  padding:28px 28px; width:100%; max-width:520px;
+  backdrop-filter:blur(12px); animation:fadeUp 0.75s 0.1s ease both;
+  position:relative;
+}
+{% if not embedded %}
+.upload-card::before { content:''; position:absolute; top:18px; right:18px; width:22px; height:22px; border-top:1.5px solid var(--accent-line); border-right:1.5px solid var(--accent-line); pointer-events:none; }
+.upload-card::after  { content:''; position:absolute; bottom:18px; left:18px; width:22px; height:22px; border-bottom:1.5px solid var(--accent-line); border-left:1.5px solid var(--accent-line); pointer-events:none; }
+{% endif %}
+
+.card-title { font-family:'Cormorant Garamond',serif; font-size:21px; font-weight:600; color:var(--text-primary); letter-spacing:0.03em; margin-bottom:4px; }
+.card-sub { font-size:11px; letter-spacing:0.14em; text-transform:uppercase; color:var(--accent); font-weight:500; margin-bottom:22px; padding-bottom:18px; border-bottom:1px solid var(--accent-line); }
+
+.form-group { margin-bottom:15px; }
+.form-group label { display:block; font-size:10.5px; letter-spacing:0.14em; text-transform:uppercase; color:var(--text-sub); font-weight:500; margin-bottom:7px; }
+
+.form-control {
+  width:100%; padding:12px 14px; border-radius:9px;
+  background:var(--input-bg); border:1px solid var(--input-border);
+  color:var(--text-primary); font-family:'Outfit',sans-serif;
+  font-size:14px; outline:none; transition:border-color 0.2s, box-shadow 0.2s, background 0.3s;
+  appearance:none; -webkit-appearance:none;
+  /* Larger tap targets on mobile */
+  min-height:44px;
+}
+.form-control::placeholder { color:var(--text-muted); }
+.form-control:focus { border-color:var(--input-focus); box-shadow:0 0 0 3px var(--accent-dim); }
+.form-control option { background:#0a1510; color:#e8ede9; }
+
+/* Roll row */
+.roll-row {
+  display:flex; border-radius:9px; overflow:hidden;
+  border:1px solid var(--input-border); min-height:44px;
+  transition:border-color 0.2s, box-shadow 0.2s;
+}
+.roll-row:focus-within { border-color:var(--input-focus); box-shadow:0 0 0 3px var(--accent-dim); }
+.roll-prefix {
+  flex:0 0 auto; padding:11px 14px;
+  background:rgba(10,118,212,0.15); color:var(--accent);
+  font-weight:600; font-size:14px; pointer-events:none;
+  text-align:center; white-space:nowrap;
+  border-right:1px solid var(--input-border);
+  font-family:'Outfit',sans-serif; display:flex; align-items:center;
+}
+.roll-num {
+  flex:1; padding:11px 14px;
+  background:var(--input-bg); border:none; outline:none;
+  color:var(--text-primary); font-family:'Outfit',sans-serif; font-size:14px;
+  min-height:44px;
 }
 
-select {
-    width: 100%;
-    padding: 12px;
-    border-radius: 8px;
-    border: 1px solid rgba(255,255,255,0.2);
-    background: rgba(255,255,255,0.1);
-    color: white;
-    backdrop-filter: blur(10px);
-    cursor: pointer;
+/* Upload box */
+.upload-box {
+  padding:14px; border-radius:10px;
+  background:rgba(10,118,212,0.04); border:1px solid var(--input-border);
 }
+.upload-box.optional { background:transparent; border-color:var(--border); }
+.upload-hint { margin-top:8px; font-size:11.5px; color:var(--text-muted); line-height:1.5; }
 
-select:focus {
-    outline: none;
-    box-shadow: 0 0 10px #00f7ff;
+input[type="file"] {
+  width:100%; font-family:'Outfit',sans-serif; font-size:13px;
+  color:var(--text-sub); background:transparent; border:none; outline:none; cursor:pointer;
 }
-
-select option {
-    background-color: #2f286e93;  
-    color: black;             
+input[type="file"]::file-selector-button {
+  padding:7px 14px; border-radius:7px;
+  background:var(--accent-dim); border:1px solid var(--accent-line);
+  color:var(--accent); font-family:'Outfit',sans-serif; font-size:12px; font-weight:500;
+  cursor:pointer; transition:all 0.2s; margin-right:10px;
+  /* iOS minimum tap target */
+  min-height:36px;
 }
+input[type="file"]::file-selector-button:hover { background:rgba(10,118,212,0.25); }
 
-.roll-container {
-    display: flex;
-    width: 100%;
-    border-radius: 8px;
-    overflow: hidden;
-    background: rgba(255,255,255,0.1);
+/* Submit */
+.submit-btn {
+  width:100%; padding:14px; border-radius:9px;
+  background:linear-gradient(135deg,var(--btn-from),var(--btn-to));
+  border:none; color:var(--btn-text); font-family:'Outfit',sans-serif;
+  font-size:13px; font-weight:600; letter-spacing:0.14em; text-transform:uppercase;
+  cursor:pointer; margin-top:8px; position:relative; overflow:hidden;
+  transition:opacity 0.2s, transform 0.15s, box-shadow 0.2s;
+  /* iOS tap highlight */
+  -webkit-tap-highlight-color:transparent;
+  min-height:48px;
 }
+.submit-btn::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,0.12),transparent); }
+.submit-btn:hover { opacity:.93; transform:translateY(-1px); box-shadow:0 8px 26px var(--btn-shadow); }
+.submit-btn:active { transform:translateY(0); }
+.submit-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
 
-.roll-container input#roll_prefix {
-    flex: 0 0 35%;
-    background: #00f7ff;
-    border: none;
-    padding: 12px;
-    color: rgb(0, 0, 0);
-    font-weight: bold;
-    pointer-events: none;
-    text-align: center;
+/* Toast */
+.toast {
+  position:fixed; right:14px; bottom:14px; max-width:min(440px,calc(100vw - 28px));
+  padding:12px 16px; border-radius:12px;
+  background:rgba(10,21,16,0.94); border:1px solid var(--border);
+  box-shadow:0 0 24px var(--accent-dim); color:var(--text-primary); font-size:13.5px;
+  opacity:0; transform:translateY(10px); pointer-events:none;
+  transition:opacity 220ms, transform 220ms; z-index:9999;
+  font-family:'Outfit',sans-serif;
 }
+.toast.show { opacity:1; transform:translateY(0); }
+.toast.ok  { border-color:rgba(10,118,212,0.4); }
+.toast.err { border-color:rgba(200,50,80,0.4); box-shadow:0 0 24px rgba(200,50,80,0.12); }
 
-.roll-container input#roll_number {
-    flex: 1;
-    border: none;
-    padding: 12px;
-    background: transparent;
-    color: white;
-    outline: none;
-}
+@keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
 
-button:active {
-    transform: scale(0.95);
-}
-
-button {
-    padding: 14px;
-    border: none;
-    border-radius: 10px;
-    font-size: 16px;
-    cursor: pointer;
-    background: linear-gradient(90deg, #00f7ff, #00aaff);
-    color: black;
-    font-weight: bold;
-    transition: 0.3s ease;
-    box-shadow: 0 0 15px #00f7ff;
-}
-
-button:hover {
-    transform: scale(1.05);
-    box-shadow: 0 0 25px #00f7ff;
-}
-
-.upload-box{
-    padding:14px;
-    border-radius:14px;
-    background: rgba(255, 255, 255, 0.04);
-    border:1px solid rgba(0, 247, 255, 0.22);
-    box-shadow: 0 0 18px rgba(0, 247, 255, 0.08);
-}
-
-.upload-box.optional{
-    border-color: rgba(255,255,255,0.14);
-    box-shadow:none;
-}
-
-.upload-hint{
-    margin-top:10px;
-    font-size:12px;
-    opacity:0.8;
-}
-
-/* Toast (used when embedded in /admin) */
-.toast{
-    position:fixed;
-    right:18px;
-    bottom:18px;
-    max-width: min(520px, 92vw);
-    padding:12px 14px;
-    border-radius:14px;
-    background:rgba(15,23,42,0.92);
-    border:1px solid rgba(0,255,255,0.22);
-    box-shadow:0 0 24px rgba(0,255,255,0.18);
-    color:white;
-    opacity:0;
-    transform:translateY(10px);
-    pointer-events:none;
-    transition:opacity 220ms ease, transform 220ms ease;
-    z-index:9999;
-}
-
-.toast.show{
-    opacity:1;
-    transform:translateY(0);
-}
-
-.toast.ok{
-    border-color:rgba(0,255,255,0.35);
-}
-
-.toast.err{
-    border-color:rgba(255,85,85,0.45);
-    box-shadow:0 0 24px rgba(255,85,85,0.12);
-}
-
-input:focus, select:focus {
-    box-shadow: 0 0 10px #00f7ff;
-    transition: 0.3s ease;
-}
-
-/* Responsive */
-@media (max-width: 500px) {
-    .card {
-        padding: 20px 15px;
-    }
-    h1, h2 {
-        font-size: 18px;
-    }
+/* ── RESPONSIVE ── */
+@media (max-width:520px) {
+  .upload-card { padding:20px 16px; border-radius:14px; }
+  .card-title { font-size:18px; }
+  .roll-prefix { font-size:12px; padding:11px 10px; }
 }
 </style>
 
+{% if not embedded %}
+<button class="theme-btn" onclick="toggleTheme()" aria-label="Toggle theme">
+  <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 009.79 9.79z"/></svg>
+  <svg class="icon-sun"  viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+    <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+  </svg>
+  <span id="t-label-up">Light</span>
+</button>
+<div class="standalone-header">
+  <img src="{{ url_for('static', filename='university_logo.png') }}" alt="NED University">
+  <div><h2>NED-SAMS</h2><div class="sub">Document Upload</div></div>
+</div>
+{% endif %}
+
+<div class="upload-card">
+  <div class="card-title">Upload Student Documents</div>
+  <div class="card-sub">Admission Digital Management System</div>
+
+  <form id="studentUploadForm" action="/upload" method="post" enctype="multipart/form-data" autocomplete="off">
+
+    <div class="form-group">
+      <label for="department">Department</label>
+      <select id="department" name="department" class="form-control" required>
+        <option value="">Select Department</option>
+        <option value="CE">Civil Engineering</option>
+        <option value="UIE">Urban &amp; Infrastructure Eng</option>
+        <option value="PE">Petroleum Engineering</option>
+        <option value="EEQ">Earthquake Engineering</option>
+        <option value="ENV">Environmental Engineering</option>
+        <option value="EE">Electrical Engineering</option>
+        <option value="EC">Electronic Engineering</option>
+        <option value="TE">Telecommunications Engineering</option>
+        <option value="CISE">Computer &amp; Info Systems Eng</option>
+        <option value="BME">Bio-Medical Engineering</option>
+        <option value="CSE">Computer Science &amp; IT</option>
+        <option value="SE">Software Engineering</option>
+        <option value="ME">Mechanical Engineering</option>
+        <option value="IME">Industrial &amp; Manufacturing Eng</option>
+        <option value="AME">Automotive &amp; Marine Eng</option>
+        <option value="CHE">Chemical Engineering</option>
+        <option value="PPE">Polymer &amp; Petrochemical Eng</option>
+        <option value="MAT">Materials Engineering</option>
+        <option value="MET">Metallurgical Engineering</option>
+        <option value="FE">Food Engineering</option>
+        <option value="ARCH">Architecture &amp; Planning</option>
+        <option value="ECON">Economics &amp; Management</option>
+        <option value="PHYS">Physics</option>
+        <option value="CHEM">Chemistry</option>
+        <option value="MATH">Mathematics</option>
+        <option value="ENG">English Linguistics &amp; Allied Studies</option>
+        <option value="ES">Essential Studies</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="batch">Batch</label>
+      <select id="batch" name="batch" class="form-control" required>
+        <option value="">Select Batch</option>
+        <option value="21">2021</option><option value="22">2022</option>
+        <option value="23">2023</option><option value="24">2024</option>
+        <option value="25">2025</option><option value="26">2026</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Roll Number</label>
+      <div class="roll-row">
+        <div class="roll-prefix" id="roll_prefix">__-__</div>
+        <input class="roll-num" type="text" id="roll_number" name="roll_number" placeholder="XXX" maxlength="3" pattern="\d{3}" required inputmode="numeric">
+        <input type="hidden" id="full_roll" name="full_roll">
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="domicile_files">Domicile <span style="color:var(--accent)">*</span></label>
+      <div class="upload-box">
+        <input id="domicile_files" type="file" name="domicile_files" accept="image/*" multiple required>
+        <div class="upload-hint">Upload one or more images for the Domicile document.</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="marksheet_files">Intermediate / O-Levels Mark Sheet <span style="color:var(--accent)">*</span></label>
+      <div class="upload-box">
+        <input id="marksheet_files" type="file" name="marksheet_files" accept="image/*" multiple required>
+        <div class="upload-hint">Upload one or more images for the Mark Sheet.</div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="optional_files">Other Documents <span style="color:var(--text-muted); font-weight:400; text-transform:none; letter-spacing:0">(optional)</span></label>
+      <div class="upload-box optional">
+        <input id="optional_files" type="file" name="optional_files" accept="image/*" multiple>
+        <div class="upload-hint">Additional images — each saved as a separate PDF.</div>
+      </div>
+    </div>
+
+    <button id="addStudentBtn" type="submit" class="submit-btn">Add Student →</button>
+  </form>
+  <div id="uploadToast" class="toast" aria-live="polite"></div>
+</div>
+
+{% if not embedded %}
+<div class="standalone-footer">
+  <img src="{{ url_for('static', filename='imes_lab_logo.png') }}" alt="IMES Lab">
+  <span>Powered by <strong>IMES Lab</strong></span>
+</div>
+{% endif %}
+
 <script>
-const departmentSelect = document.getElementById("department");
-const batchSelect = document.getElementById("batch");
-const rollPrefix = document.getElementById("roll_prefix");
+const departmentSelect = document.getElementById('department');
+const batchSelect      = document.getElementById('batch');
+const rollPrefixEl     = document.getElementById('roll_prefix');
+const rollInput        = document.getElementById('roll_number');
+const fullRoll         = document.getElementById('full_roll');
 
 function updateRollPrefix() {
-    const dept = departmentSelect.value;
-    const batch = batchSelect.value;
-    if (dept && batch) {
-        rollPrefix.value = `${dept}-${batch}`;
-    } else {
-        rollPrefix.value = "";
-    }
+  const d=departmentSelect.value, b=batchSelect.value;
+  rollPrefixEl.textContent = (d&&b) ? `${d}-${b}` : '__-__';
 }
-
-departmentSelect.addEventListener("change", updateRollPrefix);
-batchSelect.addEventListener("change", updateRollPrefix);
-
-document.getElementById("roll_number").addEventListener("input", function () {
-    this.value = this.value.replace(/\D/g, "").slice(0,3);
-});
-
-const rollInput = document.getElementById("roll_number");
-const fullRoll = document.getElementById("full_roll");
-
 function updateFullRoll() {
-    const dept = departmentSelect.value;
-    const batch = batchSelect.value;
-    const roll = rollInput.value;
-
-    if (dept && batch && roll.length === 3) {
-        fullRoll.value = `${dept}-${batch}-${roll}`;
-    }
+  const d=departmentSelect.value, b=batchSelect.value, r=rollInput.value;
+  fullRoll.value = (d&&b&&r.length===3) ? `${d}-${b}-${r}` : '';
 }
-
-departmentSelect.addEventListener("change", updateFullRoll);
-batchSelect.addEventListener("change", updateFullRoll);
-rollInput.addEventListener("input", updateFullRoll);
+departmentSelect.addEventListener('change', ()=>{ updateRollPrefix(); updateFullRoll(); });
+batchSelect.addEventListener('change', ()=>{ updateRollPrefix(); updateFullRoll(); });
+rollInput.addEventListener('input', function(){ this.value=this.value.replace(/\D/g,'').slice(0,3); updateFullRoll(); });
 </script>
+
+{% if not embedded %}
+<script>
+function toggleTheme() {
+  const html=document.documentElement;
+  const going=html.getAttribute('data-theme')==='dark'?'light':'dark';
+  html.setAttribute('data-theme',going);
+  const l=document.getElementById('t-label-up'); if(l) l.textContent=going==='dark'?'Light':'Dark';
+  localStorage.setItem('ned-theme',going);
+}
+(function(){
+  const s=localStorage.getItem('ned-theme');
+  if(s){ document.documentElement.setAttribute('data-theme',s); const l=document.getElementById('t-label-up'); if(l) l.textContent=s==='dark'?'Light':'Dark'; }
+})();
+</script>
+{% endif %}
 
 {% if embedded %}
 <script>
-(() => {
-  const form = document.getElementById("studentUploadForm");
-  const btn = document.getElementById("addStudentBtn");
-  const toast = document.getElementById("uploadToast");
-  if (!form || !btn || !toast) return;
-
-  let toastTimer = null;
-
-  function showToast(message, kind) {
-    if (toastTimer) clearTimeout(toastTimer);
-    toast.classList.remove("ok", "err", "show");
-    toast.textContent = message;
-    toast.classList.add(kind === "err" ? "err" : "ok");
-    requestAnimationFrame(() => toast.classList.add("show"));
-    toastTimer = setTimeout(() => toast.classList.remove("show"), 4200);
+(()=>{
+  const form=document.getElementById('studentUploadForm');
+  const btn=document.getElementById('addStudentBtn');
+  const toast=document.getElementById('uploadToast');
+  if(!form||!btn||!toast)return;
+  let toastTimer=null;
+  function showToast(message,kind){
+    if(toastTimer)clearTimeout(toastTimer);
+    toast.classList.remove('ok','err','show');
+    toast.textContent=message;
+    toast.classList.add(kind==='err'?'err':'ok');
+    requestAnimationFrame(()=>toast.classList.add('show'));
+    toastTimer=setTimeout(()=>toast.classList.remove('show'),4200);
   }
-
-  form.addEventListener("submit", async (e) => {
+  form.addEventListener('submit',async(e)=>{
     e.preventDefault();
-
-    if (!fullRoll.value) {
-      showToast("Please select Department, Batch and enter a 3-digit roll number.", "err");
-      return;
-    }
-
-    const data = new FormData(form);
-    btn.disabled = true;
-    const oldLabel = btn.textContent;
-    btn.textContent = "Uploading...";
-
-    try {
-      const res = await fetch(form.action, { method: "POST", body: data });
-      const text = await res.text();
-      if (!res.ok) {
-        showToast(text || "Upload failed.", "err");
-        return;
-      }
-
-      showToast(text || "Documents uploaded successfully.", "ok");
-      form.reset();
-      rollPrefix.value = "";
-      fullRoll.value = "";
-    } catch (err) {
-      showToast("Network error. Please try again.", "err");
-    } finally {
-      btn.disabled = false;
-      btn.textContent = oldLabel;
-    }
+    if(!fullRoll.value){ showToast('Please select Department, Batch and enter a 3-digit roll number.','err'); return; }
+    const data=new FormData(form);
+    btn.disabled=true; const oldLabel=btn.textContent; btn.textContent='Uploading…';
+    try{
+      const res=await fetch(form.action,{method:'POST',body:data});
+      const text=await res.text();
+      if(!res.ok){ showToast(text||'Upload failed.','err'); return; }
+      showToast(text||'Documents uploaded successfully.','ok');
+      form.reset(); rollPrefixEl.textContent='__-__'; fullRoll.value='';
+    }catch(err){ showToast('Network error. Please try again.','err'); }
+    finally{ btn.disabled=false; btn.textContent=oldLabel; }
   });
 })();
 </script>
 {% endif %}
 
-
-
-
+{% if not embedded %}
+</body>
+</html>
+{% endif %}
