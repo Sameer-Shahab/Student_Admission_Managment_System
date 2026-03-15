@@ -1,27 +1,19 @@
 @echo off
 echo ========================================
-echo IMES Document Management System
-echo Starting Both Servers
+echo NED-SAMS (Flask)
+echo Starting Backend Server
 echo ========================================
 echo.
 
-REM Start Backend Server
-echo Starting Backend Server...
-start "IMES Backend" cmd /k "cd server && venv\Scripts\activate.bat && python app.py"
-
-REM Wait a bit for backend to initialize
-timeout /t 3 /nobreak > nul
-
-REM Start Frontend Server
-echo Starting Frontend Server...
-start "IMES Frontend" cmd /k "cd client && npm run dev"
+REM Start Backend Server (Flask templates)
+echo Starting Backend Server (Flask templates)...
+start "NED-SAMS Backend" cmd /k "cd /d \"%~dp0\" && .venv\\Scripts\\python.exe server\\app.py"
 
 echo.
 echo ========================================
-echo Both servers are starting!
-echo Backend: http://localhost:5000
-echo Frontend: http://localhost:3000
+echo Backend is starting...
+echo Open: http://localhost:5000/login
 echo ========================================
 echo.
-echo Press any key to exit (servers will continue running)...
+echo Press any key to exit (server will continue running)...
 pause > nul
