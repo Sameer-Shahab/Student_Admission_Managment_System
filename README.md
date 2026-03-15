@@ -15,7 +15,7 @@ Flask app (server-rendered templates) for managing student document uploads and 
 
 Notes:
 - Local data like `server/database.db` and uploaded PDFs are ignored by git by default.
-- There is a `client/` Next.js app in this repo, but the official UI for this project is the Flask templates in `server/templates/`.
+- This repo is Flask (server-rendered templates). There is no separate frontend app.
 
 ## Quick Start (Windows / VS Code)
 1. Run setup (creates `.venv` and installs dependencies):
